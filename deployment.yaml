@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wiki-producer
+  labels:
+    app: wiki-producer
+spec:
+  replicas: 1  # We only need one stream reader
+  selector:
+    matchLabels:
+      app: wiki-producer
+  template:
+    metadata:
+      labels:
+        app: wiki-producer
+    spec:
+      containers:
+      - name: producer
+        image: wiki-producer:v1
+        imagePullPolicy: Never  # IMPORTANT: Uses the local image we build manually
+        env:
+        - name: KAFKA_BROKER
+          # This points to the Kafka Service inside your cluster
+          value: "my-kafka.default.svc.cluster.local:9092"
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "500m"
+
